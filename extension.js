@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 
-// Function to fetch test cases from LeetCode problem URL
 async function fetchTestCases(problemUrl) {
     try {
         const match = problemUrl.match(/problems\/([\w-]+)\//);
@@ -31,25 +30,23 @@ async function fetchTestCases(problemUrl) {
         const input = [];
         const output = [];
 
-        // Process each example
         examples.forEach((example) => {
-            let inputCase = example[1].replace(/<.*?>/g, '').trim(); // Clean HTML tags for input
-            let outputCase = example[2].replace(/<.*?>/g, '').trim(); // Clean HTML tags for output
+            let inputCase = example[1].replace(/<.*?>/g, '').trim(); 
+            let outputCase = example[2].replace(/<.*?>/g, '').trim(); 
 
-            // Transform the input format
+            
             inputCase = inputCase
                 .replace(/\[(.*?)\]/g, (_, arrayContent) => arrayContent.replace(/,/g, ' ')) 
-                .replace(/([a-zA-Z0-9]+)\s*=\s*/g, '') // Remove variable assignments
-                .replace(/, /g, '\n'); // Replace commas with newline for array items
+                .replace(/([a-zA-Z0-9]+)\s*=\s*/g, '')
+                .replace(/, /g, '\n'); 
 
-            // Transform the output format
-            outputCase = outputCase.replace(/\[(.*?)\]/g, (_, arrayContent) => arrayContent.replace(/,/g, ' ')); // Format arrays
+            outputCase = outputCase.replace(/\[(.*?)\]/g, (_, arrayContent) => arrayContent.replace(/,/g, ' ')); 
 
             input.push(inputCase);
             output.push(outputCase);
         });
 
-        // Save the test cases to files
+       
         await saveTestCases(input, output);
 
         console.log('Test cases fetched successfully!');
@@ -63,7 +60,7 @@ async function fetchTestCases(problemUrl) {
     }
 }
 
-// Function to save test cases to files
+
 async function saveTestCases(inputs, outputs) {
     try {
         const folderPath = path.join(__dirname, 'test_cases');
@@ -85,7 +82,6 @@ async function saveTestCases(inputs, outputs) {
     }
 }
 
-// Function to run the user's code and compare with expected output
 async function runCode(language, filePath, inputFilePath) {
     try {
         let command = '';
@@ -119,12 +115,11 @@ async function runCode(language, filePath, inputFilePath) {
     }
 }
 
-// Function to compare actual output and expected output
 function compareOutputs(actualOutput, inputFilePath) {
     const expectedOutputPath = inputFilePath.replace('input', 'output');
     const expectedOutput = fs.readFileSync(expectedOutputPath, 'utf8').trim();
 
-    // Compare actual output with expected output
+    
     if (actualOutput.trim() === expectedOutput) {
         console.log(`Test Passed for ${inputFilePath}`);
         vscode.window.showInformationMessage(`Test Passed for ${inputFilePath}`);
@@ -136,11 +131,11 @@ function compareOutputs(actualOutput, inputFilePath) {
     }
 }
 
-// Activation function for VS Code extension
+
 function activate(context) {
     console.log('Congratulations, your extension "cph-extension-leet-code-vs-" is now active!');
 
-    // Register command to fetch test cases
+    
     const disposable = vscode.commands.registerCommand('cph-extension-leet-code-vs-.fetchTestCases', async function () {
         const url = await vscode.window.showInputBox({
             prompt: 'Enter the LeetCode problem URL'
@@ -151,7 +146,6 @@ function activate(context) {
         }
     });
 
-    // Register command to run test cases
     const runTestCommand = vscode.commands.registerCommand('cph-extension-leet-code-vs-.runTestCases', async function () {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
@@ -174,7 +168,7 @@ function activate(context) {
         const testCasesDir = path.join(__dirname, 'test_cases');
         const inputFiles = fs.readdirSync(testCasesDir).filter(file => file.startsWith('input'));
 
-        // Run test cases
+        
         for (const inputFile of inputFiles) {
             const inputFilePath = path.join(testCasesDir, inputFile);
             await runCode(language, filePath, inputFilePath);
@@ -185,7 +179,6 @@ function activate(context) {
     context.subscriptions.push(disposable);
 }
 
-// Deactivation function
 function deactivate() {}
 
 module.exports = {
